@@ -1,5 +1,5 @@
 ---
-title: "Survey Analyses"
+title: "To_Do_List"
 author: "Nora Nickels"
 date: "11/8/2018"
 output: html_document
@@ -38,7 +38,7 @@ Beyond that, confederates also assess a single-item attractiveness measure of th
 * Present factors and loadings in table format
 * Standardize confederate ratings; for each confederate individually, convert ratings of participants to z-scores, to account fo difference in response scale usage before correlating ratings with hormonal variables
 
-```{r confederate_survey}
+```{r participant_survey}
 
 # confederate survey analyses here
 
