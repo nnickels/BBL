@@ -1,0 +1,47 @@
+---
+title: "To_Do_List"
+author: "Nora Nickels"
+date: "11/8/2018"
+output: html_document
+---
+
+# Survey Analyses
+
+#### Participant Survey Responses
+
+Participants in our experiment completed a survey (In Lab Survey #3 Items, after the TIPI round two) assessing their reactions to the confederate and their conversation together. All items employ a 7-point Likert scale. One item assessed participants' rating of confederate attractiveness overall. Three items assess participant impressions of confederates' physical attractiveness: beautiful, sexy, and cute (find Cronbach's alpha). Four items assess the perceived positivity of the conversation, with participants indicating how pleasant, stressful, exciting, and interesting they found the interaction to be (find Cronbach's alpha, with stress reverse scored). Single items assessed how much participants thought the confederates would be desirable as a friend, long-term romantic partner, and short-term romantic partner. Single items also assessed how much participants believed the subject made eye contact with them, as well as overall liked them (e.g., how much they beleived the confederate liked the participant, themselves).
+
+###### To Do
+
+* Find cronbach's alpha for two loadings of item combinations above
+* Exploratory factor analysis on all items
+* Present factors and loadings in table format
+
+```{r participant_survey}
+
+# Participant survey analyses here
+
+```
+
+#### Confederate Survey Responses
+
+Confederates in our experiment also complete a survey that assesses the impressions of the subjects' behaviors during the brief social interactions. We will use a factor analysis to see if we can reveal the same three distinct factors revealed by Roney et al. in 2003 and 2007. If they do, we can employ these as composite variables in our reports. Three three factors and their potential highest loading items would be as follow: 
+* a display factor ('tried to impress you, 'showed off to you', 'eager to talk to about himself/herself'), characterized by items in which the participants were projecting information about themselves, and could be interpreted as a measure of courtship-like behavior
+* a polite interest factor ('listened carefully', 'interested in hearing about you', 'asking questions about you'), characterized by items suggesting attempts to gather information from the confederates
+* an arousal factor ('was speaking fast','was excited', 'was not bored')
+Beyond that, confederates also assess a single-item attractiveness measure of the participant, and a single item measure of eye contact. Some of these single item variables may load differently via factor analysis.
+
+###### To Do
+
+* Find cronbach's alpha for three loadings of item combinations above
+* Exploratory factor analysis on all items - replicate the three distince factors found by Roney et al.
+* Present factors and loadings in table format
+* Standardize confederate ratings; for each confederate individually, convert ratings of participants to z-scores, to account fo difference in response scale usage before correlating ratings with hormonal variables
+
+```{r participant_survey}
+
+# confederate survey analyses here
+
+```
+
+
