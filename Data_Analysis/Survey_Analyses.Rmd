@@ -2,7 +2,7 @@
 title: "Survey Analyses"
 author: "Nora Nickels"
 date: "11/8/2018"
-output: html_document
+output: github_document
 ---
 
 # Survey Analyses

@@ -2,7 +2,7 @@
 title: "Theoretical_Questions"
 author: "Nora Nickels"
 date: "11/8/2018"
-output: html_document
+output: github_document
 ---
 
 # Theoretical Questions
