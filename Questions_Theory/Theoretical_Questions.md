@@ -6,8 +6,57 @@ Nora Nickels
 Theoretical Questions
 =====================
 
-### Aim 1: Investigate the effects of testosterone (and cortisol) on courtship behavior
+Aim 1: Investigate the effects of testosterone (and cortisol) on courtship behavior
+-----------------------------------------------------------------------------------
 
-#### Hypotheses:
+To explore the relationship between testsoterone reactivity and courtship behavioral, we measured how brief social interactions with potential courtship partners affected T responses in males and feamles, and how testosterone reactivity correlates with subsequent behavioral responses.
 
--
+### Hypotheses:
+
+-   Expect to replicate findinds of male T increase after social interactions with females
+-   T increases corelating positively with courtship behavioral measures
+-   Expected correlations to be strongest in indiciduals who rank interaction partners as more attractive, desirable, etc.
+-   For females expect a similar effect of T increases
+
+#### Analyses for behavioral and hormonal resposnes of women and men to brief opposite sex interactions
+
+Note: These analyses will be on control individuals only
+
+###### Questionnaires and Scales
+
+-   Cronbach's alphas
+-   Factor scales with individual item loadings
+
+###### Hormone Assays
+
+-   inter and intra assay coeffciients of variations
+
+##### Results
+
+###### Background variables and perceptions of stimulus confederates
+
+-   Average ratings of male and female confederates
+
+###### Hormonal Measures
+
+-   Number of excluded individuals
+-   Total N for males and females
+-   Following analyses for both cortisol and testosterone: separately for males and females, unless cortisol baseline is not significantly different between males and females, can also analyze cortisol together for males and females
+-   What baseline and covariate measures do or do not correlate with baseline, second/third samples, and change scores
+-   Average change score (percent) in male condition and female condition, with N and SD for baseline, second, and third samples for each
+-   Paired t tests on log transformed data for males and females separately for baseline to B, B to C, and baseline to max delta, with reported t(df), P, and d
+-   Test for change in cort and T levels being related to participants' ratings of confederates' physical attractiveness, desirability as friends or romantic partners.
+-   Check for effects of past sexual experience (recent?) and relationship status on mean change levels in T
+
+###### Behavioral Ratings
+
+-   Results of factor analysis with PCA and varimax rotation
+-   Factor scales computed as average scores across items within the respective factors
+-   Male and female average ratings on each scale (ts(df), Ps)
+-   Ratings differ between male and female conditions significantly
+-   Do participant ratings predict confederate ratings (e.g., participant ratings of desirability predict confederate ratings of polite interest, display, or arousal); report r(df), P of correlations
+-   So show validity of the behavioral rating scales
+
+###### Relationship between hormonal and behavioral measures
+
+-   Relationship between change in T levels and confederate ratings of participant behaviors; report correlations (r(df), P

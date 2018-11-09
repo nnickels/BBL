@@ -14,6 +14,7 @@ Participants in our experiment completed a survey (In Lab Survey \#3 Items, afte
 
 -   Find cronbach's alpha for two loadings of item combinations above
 -   Exploratory factor analysis on all items
+-   PCA, with varimax rotation
 -   Present factors and loadings in table format
 
 ``` r
