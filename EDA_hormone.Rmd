@@ -1,0 +1,384 @@
+---
+title: EDA Hormonal Data
+output:
+  html_document: 
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+# global setting
+knitr::opts_chunk$set(echo = T)
+options(warn = -1)
+
+# load libraries
+library(tidyverse)
+library(ggplot2)
+library(ggpmisc)
+library(rcompanion)
+library(knitr)
+library(broom)
+# setting theme for ggplot
+theme_set(theme_minimal())
+theme_update(text = element_text(family = "Times"))
+```
+
+
+```{r,warning = FALSE, message = FALSE}
+## load the data
+
+# hormone concentration data
+hormone <- read_csv("data/2018 Assay Data - Sheet1.csv") %>%
+  select(-"Participant #")
+
+# the information of each subject
+subject <-
+  read_csv(
+    "data/Participant Information _ Condition Spreadsheet - Participants.csv",
+    col_names = TRUE,
+    col_types = cols()
+  ) %>%
+  slice(2:157) %>%
+  select("Participant #","Participant ID", "Condition # (1-8)", 
+         "Gender", "TSST/Control Condition", "Judges Sex")
+colnames(subject) <- c("number","ID","condition","gender","tsst","judge_sex")
+```
+
+```{r}
+# create a combined dataframe
+# each observation = each subject in each hormone in each session
+relation <- full_join(subject, hormone, by = c("ID" = "Participant ID")) %>%
+  filter(ID != "105C", ID != "113S", ID != "118C", ID != "146C", ID != "151C") %>%
+  select(number, everything(), -Cort_A_S1_Conc, -Cort_B_S1_Conc, -Cort_C_S1_Conc, 
+         -Cort_A_S2_Conc, -Cort_B_S2_Conc, -Cort_C_S2_Conc, -Testo_A_S1_Conc, 
+         -Testo_B_S1_Conc, -Testo_C_S1_Conc, -Testo_A_S2_Conc, -Testo_B_S2_Conc, -Testo_C_S2_Conc) %>%
+  unite("Cort", c(Cort_A_Conc, Cort_A_Std_Dev, "CV_(%)_Cort_A",
+                  Cort_B_Conc, Cort_B_Std_Dev, "CV_(%)_Cort_B",
+                  Cort_C_Conc, Cort_C_Std_Dev, "CV_(%)_Cort_C")) %>%
+  unite("Testo", c(Testo_A_Conc, Testo_A_Std_Dev, "CV_(%)_Testo_A",
+                  Testo_B_Conc, Testo_B_Std_Dev, "CV_(%)_Testo_B",
+                  Testo_C_Conc, Testo_C_Std_Dev, "CV_(%)_Testo_C")) %>%
+  gather(Cort, Testo, key = "hormone", value = "value") %>%
+  separate(value, into = c("A_Conc", "A_Std", "A_CV", 
+                           "B_Conc", "B_Std", "B_CV",
+                           "C_Conc", "C_Std", "C_CV"), sep = "_", convert = T) %>%
+  # create a column contain difference of concentration between session
+  mutate(Diff_B_A = B_Conc - A_Conc,
+         Diff_C_B = C_Conc - B_Conc,
+         Diff_C_A = C_Conc - A_Conc) %>%
+  mutate(per_Diff_base_B_A = Diff_B_A/A_Conc,
+         per_Diff_base_C_B = Diff_C_B/A_Conc,
+         per_Diff_base_C_A = Diff_C_A/A_Conc) %>%
+  mutate(max_Diff = pmax(Diff_B_A, Diff_C_A)) %>%
+  mutate(per_Diff_max_B_A = Diff_B_A/max_Diff,
+         per_Diff_max_C_B = Diff_C_B/max_Diff,
+         per_Diff_max_C_A = Diff_C_A/max_Diff)
+
+log_df <- relation %>%
+  select(A_Conc, B_Conc, C_Conc) %>%
+  mutate_all(.funs = log)
+colnames(log_df) <- paste("log", colnames(log_df), sep = "_")
+
+relation <- cbind(relation,log_df)
+```
+
+```{r}
+# Create a dataframe unique for each hormone/ each condition
+
+## Cortisol
+Cort <- relation %>%
+  filter(hormone == "Cort")
+
+Cort_F <- Cort %>%
+  filter(gender == "F")
+
+Cort_M <- Cort %>%
+  filter(gender == "M")
+
+scale_Cort <- Cort %>%
+  select(A_Conc, B_Conc, C_Conc, Diff_B_A:Diff_C_A) %>%
+  mutate_all(.funs = scale)
+colnames(scale_Cort) <- paste("z", colnames(scale_Cort), sep = "_")
+
+scale_Cort <- cbind(Cort,scale_Cort)
+
+write.csv(scale_Cort, "Cortisol.csv")
+
+## Testosterone
+Testo <- relation %>%
+  filter(hormone == "Testo")
+
+Testo_F <- Testo %>%
+  filter(gender == "F")
+
+Testo_M <- Testo %>%
+  filter(gender == "M")
+
+scale_Testo_F <- Testo_F %>%
+  select(A_Conc, B_Conc, C_Conc, Diff_B_A:Diff_C_A) %>%
+  mutate_all(.funs = scale)
+colnames(scale_Testo_F) <- paste("z", colnames(scale_Testo_F), sep = "_")
+
+scale_Testo_F <- cbind(Testo_F,scale_Testo_F)
+
+write.csv(scale_Testo_F, "Testosterone_F.csv")
+
+scale_Testo_M <- Testo_M %>%
+  select(A_Conc, B_Conc, C_Conc, Diff_B_A:Diff_C_A) %>%
+  mutate_all(.funs = scale)
+colnames(scale_Testo_M) <- paste("z", colnames(scale_Testo_M), sep = "_")
+
+scale_Testo_M <- cbind(Testo_M,scale_Testo_M)
+
+write.csv(scale_Testo_M, "Testosterone_M.csv")
+```
+
+## Cortisol
+### Baseline
+
+```{r}
+t.test(Cort_F$A_Conc, Cort_M$A_Conc)
+```
+
+There is no significant different between Baseline Cortisol of females and males. Thererfore, we will analyse Cortisol without separation in gender.  
+
+```{r}
+sum_table <- function(df,var){
+  rv <- summarise(df,
+                  n = n(),
+                  mean = mean(var),
+                  sd = sd(var),
+                  min = min(var),
+                  median = median(var),
+                  max = max(var)
+                  )
+  return(rv)
+}
+
+kable(sum_table(Cort,Cort$A_Conc))
+```
+
+```{r}
+library(ggrepel)
+ggplot(scale_Cort, aes(z_A_Conc)) +
+  geom_dotplot(dotsize = 0.4,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red")
+
+shapiro.test(scale_Cort$z_A_Conc)
+```
+The distribution of Baseline Cortisol concentration is skewed to the right.  
+
+
+```{r}
+ggplot(Cort, aes(log_A_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Cort$log_A_Conc)
+```
+
+However, the log of Baseline Cortisol concentration is normal distributed. Therefore, we will use log of Baseline Cortisol concentration to analyse from now on.
+
+### After TSST
+
+```{r}
+t.test(Cort_F$B_Conc, Cort_M$B_Conc)
+```
+
+```{r}
+kable(sum_table(Cort,Cort$B_Conc))
+```
+
+```{r}
+ggplot(scale_Cort, aes(z_B_Conc)) +
+  geom_dotplot(dotsize = 0.4,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red")
+
+shapiro.test(scale_Cort$z_B_Conc)
+```
+
+```{r}
+ggplot(Cort, aes(log_B_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Cort$log_B_Conc)
+```
+
+We will also use log of Cortisol concentration for after TSST.
+
+### After social interaction
+
+```{r}
+t.test(Cort_F$C_Conc, Cort_M$C_Conc)
+```
+
+```{r}
+kable(sum_table(Cort,Cort$C_Conc))
+```
+
+```{r}
+ggplot(scale_Cort, aes(z_C_Conc)) +
+  geom_dotplot(dotsize = 0.35,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red")
+
+shapiro.test(scale_Cort$z_C_Conc)
+```
+
+```{r}
+ggplot(Cort, aes(log_C_Conc)) +
+  geom_dotplot(dotsize = 0.6,alpha = 0.7)
+
+shapiro.test(Cort$log_C_Conc)
+```
+
+Distribution of log of Cortisol concentration is still not completely normal. However, it is better that the raw data. Thus, we will also use log of Cortisol concentration for after Social interaction.
+
+## Testosterone (M)
+### Baseline
+
+```{r}
+kable(sum_table(Testo_M,Testo_M$A_Conc))
+```
+
+```{r}
+ggplot(scale_Testo_M, aes(z_A_Conc)) +
+  geom_dotplot(dotsize = 0.7,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red")
+
+shapiro.test(scale_Testo_M$z_A_Conc)
+```
+
+
+```{r}
+ggplot(Testo_M, aes(log_A_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Testo_M$log_A_Conc)
+```
+
+We will use log for male baseline testosterone.
+
+
+### After TSST
+
+```{r}
+kable(sum_table(Testo_M,Testo_M$B_Conc))
+```
+
+```{r}
+ggplot(scale_Testo_M, aes(z_B_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red")
+
+shapiro.test(scale_Testo_M$z_B_Conc)
+```
+
+```{r}
+ggplot(Testo_M, aes(log_B_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Testo_M$log_B_Conc)
+```
+
+### After Social Interaction
+
+```{r}
+kable(sum_table(Testo_M,Testo_M$C_Conc))
+```
+
+```{r}
+ggplot(scale_Testo_M, aes(z_C_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red")
+
+shapiro.test(scale_Testo_M$z_C_Conc)
+```
+
+```{r}
+ggplot(Testo_M, aes(log_C_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Testo_M$log_C_Conc)
+```
+
+## Testosterone (F)
+### Baseline
+
+```{r}
+kable(sum_table(Testo_F,Testo_F$A_Conc))
+```
+
+```{r}
+ggplot(scale_Testo_F, aes(z_A_Conc)) +
+  geom_dotplot(dotsize = 0.7,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red") +
+  geom_vline(aes(xintercept = -2),color = "red") 
+
+shapiro.test(scale_Testo_F$z_A_Conc)
+```
+
+
+```{r}
+ggplot(Testo_F, aes(log_A_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Testo_F$log_A_Conc)
+```
+
+We will use log for female baseline testosterone.
+
+
+### After TSST
+
+```{r}
+kable(sum_table(Testo_F,Testo_F$B_Conc))
+```
+
+```{r}
+ggplot(scale_Testo_F, aes(z_B_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red") +
+  geom_vline(aes(xintercept = -2),color = "red") 
+
+shapiro.test(scale_Testo_F$z_B_Conc)
+```
+
+```{r}
+ggplot(Testo_F, aes(log_B_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Testo_F$log_B_Conc)
+```
+We will use log for after TSST female testosterone.  
+
+### After social interaction
+
+```{r}
+kable(sum_table(Testo_F,Testo_F$C_Conc))
+```
+
+```{r}
+ggplot(scale_Testo_F, aes(z_C_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7) +
+  geom_vline(aes(xintercept = 2),color = "red") +
+  geom_vline(aes(xintercept = 3),color = "red") +
+  geom_vline(aes(xintercept = -2),color = "red") 
+
+shapiro.test(scale_Testo_F$z_C_Conc)
+```
+
+```{r}
+ggplot(Testo_F, aes(log_C_Conc)) +
+  geom_dotplot(dotsize = 0.8,alpha = 0.7)
+
+shapiro.test(Testo_F$log_C_Conc)
+```
+
+We should use the raw data for female testosterone after Social Interaction.
