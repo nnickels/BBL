@@ -1,12 +1,10 @@
 ---
-title: "EDA Correlation after TSST"
+title: "EDA_correlation_basline"
 output: 
-  html_document:
+  github_document:
     toc: true
     toc_depth: 3
 ---
-
-> Only participants in TSST condition
 
 ```{r setup, include=FALSE}
 # global setting
@@ -34,18 +32,15 @@ survey <- read_csv("data/survey_tidy.csv") %>%
 
 Cort <- read_csv("data/Cortisol.csv") %>%
   inner_join(survey) %>%
-  select(-number, -X1) %>%
-  filter(tsst == "TSST")
+  select(-number, -X1)
 
 Testo_F <- read_csv("data/Testosterone_F.csv") %>%
   inner_join(survey) %>%
-  select(-number, -X1) %>%
-  filter(tsst == "TSST")
+  select(-number, -X1)
 
 Testo_M <- read_csv("data/Testosterone_M.csv") %>%
   inner_join(survey) %>%
-  select(-number, -X1) %>%
-  filter(tsst == "TSST")
+  select(-number, -X1)
 
 ```
 
@@ -55,7 +50,7 @@ Testo_M <- read_csv("data/Testosterone_M.csv") %>%
 ### Condition before the experimental session
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, eat_drink, brush_before, sick_now, sick_past_wk, 
+  select(A_Conc, eat_drink, brush_before, sick_now, sick_past_wk, 
          is_worry_today, sleep_hrs_last_night, exercise)
 
 res2 <- rcorr(as.matrix(res2))
@@ -64,10 +59,11 @@ corrplot(res2$r, type="upper", order="original",
 ```
 
 ### Scales
-
+* rMEQ
+* sMARS
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, rMEQ_1_5, rMEQ_6, AQ, Anx_T, ACE, Lon, Mac_SS, sMARS)
+  select(A_Conc, rMEQ_1_5, rMEQ_6, AQ, Anx_T, ACE, Lon, Mac_SS, sMARS)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -77,7 +73,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Demographic
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, age, Dem_Eth, Dem_Educ, Dem_Raised, Dem_Inc)
+  select(A_Conc, age, Dem_Eth, Dem_Educ, Dem_Raised, Dem_Inc)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -87,7 +83,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Demographic (behavior)
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, Dem_Alc, Dem_Contra, Dem_Smoke, Dem_Subst)
+  select(A_Conc, Dem_Alc, Dem_Contra, Dem_Smoke, Dem_Subst)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -95,9 +91,12 @@ corrplot(res2$r, type="upper", order="original",
 ```
 
 ### Demographic (relationship)
+* Relationship Term (>6 mos)
+* Relationship Stability
+* Relationship Commitment
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, Dem_Marr, Dem_RelSta, Dem_RelTerm, Dem_RelLeng, Dem_RelDom, 
+  select(A_Conc, Dem_Marr, Dem_RelSta, Dem_RelTerm, Dem_RelLeng, Dem_RelDom, 
          Dem_RelStab, Dem_Commit, Dem_Marr_Length, Dem_Sexual_Activity) 
 
 res2[is.na(res2)] <- 0
@@ -110,7 +109,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Personality
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, BFI_E, BFI_A, BFI_C, BFI_N, BFI_O,
+  select(A_Conc, BFI_E, BFI_A, BFI_C, BFI_N, BFI_O,
          TIPI_E, TIPI_A, TIPI_C, TIPI_ES, TIPI_O,
          TIPI_E_Post, TIPI_A_Post, TIPI_C_Post, TIPI_ES_Post, TIPI_O_Post)
 
@@ -124,7 +123,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Mating Orientation
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, STMO, LTMO, Future_STMO, Future_LTMO)
+  select(A_Conc, STMO, LTMO, Future_STMO, Future_LTMO)
 
 res2[is.na(res2)] <- 0
 
@@ -136,7 +135,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Mating Behavior
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, PSE_1:PSE_Fantas)
+  select(A_Conc, PSE_1:PSE_Fantas)
 
 res2[is.na(res2)] <- 0
 
@@ -149,7 +148,7 @@ corrplot(res2$r, type="upper", order="original",
 ### STAI
 ```{r}
 res2 <- Cort %>%
-  select(per_Diff_base_B_A, STAI_S, STAI_S_Post)
+  select(A_Conc, STAI_S, STAI_S_Post)
 
 res2[is.na(res2)] <- 0
 
@@ -160,10 +159,11 @@ corrplot(res2$r, type="upper", order="original",
 
 ## Testosterone (M)
 ### Condition before the experimental session
+* Eat/Drink
     
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, eat_drink, brush_before, sick_now, sick_past_wk, 
+  select(A_Conc, eat_drink, brush_before, sick_now, sick_past_wk, 
          is_worry_today, sleep_hrs_last_night, exercise)
 
 res2 <- rcorr(as.matrix(res2))
@@ -174,7 +174,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Scales
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, rMEQ_1_5, rMEQ_6, AQ, Anx_T, ACE, Lon, Mac_SS, sMARS)
+  select(A_Conc, rMEQ_1_5, rMEQ_6, AQ, Anx_T, ACE, Lon, Mac_SS, sMARS)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -184,7 +184,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Demographic
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, age, Dem_Eth, Dem_Educ, Dem_Raised, Dem_Inc)
+  select(A_Conc, age, Dem_Eth, Dem_Educ, Dem_Raised, Dem_Inc)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -192,20 +192,21 @@ corrplot(res2$r, type="upper", order="original",
 ```
 
 ### Demographic (behavior)
+* Smoking
     
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, Dem_Alc, Dem_Smoke, Dem_Subst)
+  select(A_Conc, Dem_Alc, Dem_Smoke, Dem_Subst)
 
-res2 <- rcorr(as.matrix(res2)) 
-
-corrplot(res2$r, type="upper", order="original")
+res2 <- rcorr(as.matrix(res2))
+corrplot(res2$r, type="upper", order="original", 
+         p.mat = res2$P, sig.level = 0.05, insig = "label_sig")
 ```
 
 ### Demographic (relationship)
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, Dem_Marr, Dem_RelSta, Dem_RelTerm, Dem_RelLeng, Dem_RelDom, 
+  select(A_Conc, Dem_Marr, Dem_RelSta, Dem_RelTerm, Dem_RelLeng, Dem_RelDom, 
          Dem_RelStab, Dem_Commit, Dem_Sexual_Activity) 
 
 res2[is.na(res2)] <- 0
@@ -218,7 +219,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Personality
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, BFI_E, BFI_A, BFI_C, BFI_N, BFI_O,
+  select(A_Conc, BFI_E, BFI_A, BFI_C, BFI_N, BFI_O,
          TIPI_E, TIPI_A, TIPI_C, TIPI_ES, TIPI_O,
          TIPI_E_Post, TIPI_A_Post, TIPI_C_Post, TIPI_ES_Post, TIPI_O_Post)
 
@@ -230,10 +231,11 @@ corrplot(res2$r, type="upper", order="original",
 ```
 
 ### Mating Orientation
-
+* LTMO
+    
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, STMO, LTMO, Future_STMO, Future_LTMO)
+  select(A_Conc, STMO, LTMO, Future_STMO, Future_LTMO)
 
 res2[is.na(res2)] <- 0
 
@@ -245,7 +247,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Mating Behavior
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, PSE_1:PSE_Fantas)
+  select(A_Conc, PSE_1:PSE_Fantas)
 
 res2[is.na(res2)] <- 0
 
@@ -258,7 +260,7 @@ corrplot(res2$r, type="upper", order="original",
 ### STAI
 ```{r}
 res2 <- Testo_M %>%
-  select(per_Diff_base_B_A, STAI_S, STAI_S_Post)
+  select(A_Conc, STAI_S, STAI_S_Post)
 
 res2[is.na(res2)] <- 0
 
@@ -269,10 +271,11 @@ corrplot(res2$r, type="upper", order="original",
 
 ## Testosterone (F)
 ### Condition before the experimental session
+* Eat/Drink
     
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, eat_drink, brush_before, sick_now, sick_past_wk, 
+  select(A_Conc, eat_drink, brush_before, sick_now, sick_past_wk, 
          is_worry_today, sleep_hrs_last_night, exercise)
 
 res2 <- rcorr(as.matrix(res2))
@@ -283,7 +286,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Scales
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, rMEQ_1_5, rMEQ_6, AQ, Anx_T, ACE, Lon, Mac_SS, sMARS)
+  select(A_Conc, rMEQ_1_5, rMEQ_6, AQ, Anx_T, ACE, Lon, Mac_SS, sMARS)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -293,7 +296,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Demographic
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, age, Dem_Eth, Dem_Educ, Dem_Raised, Dem_Inc)
+  select(A_Conc, age, Dem_Eth, Dem_Educ, Dem_Raised, Dem_Inc)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -301,10 +304,11 @@ corrplot(res2$r, type="upper", order="original",
 ```
 
 ### Demographic (behavior)
-
+* Contraception
+    
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, Dem_Alc, Dem_Contra, Dem_Smoke, Dem_Subst)
+  select(A_Conc, Dem_Alc, Dem_Contra, Dem_Smoke, Dem_Subst)
 
 res2 <- rcorr(as.matrix(res2))
 corrplot(res2$r, type="upper", order="original", 
@@ -314,7 +318,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Demographic (relationship)
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, Dem_Marr, Dem_RelSta, Dem_RelTerm, Dem_RelLeng, Dem_RelDom, 
+  select(A_Conc, Dem_Marr, Dem_RelSta, Dem_RelTerm, Dem_RelLeng, Dem_RelDom, 
          Dem_RelStab, Dem_Commit, Dem_Marr_Length, Dem_Sexual_Activity) 
 
 res2[is.na(res2)] <- 0
@@ -325,10 +329,12 @@ corrplot(res2$r, type="upper", order="original",
 ```
 
 ### Personality
+* BFI_C
+* TIPI_O
     
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, BFI_E, BFI_A, BFI_C, BFI_N, BFI_O,
+  select(A_Conc, BFI_E, BFI_A, BFI_C, BFI_N, BFI_O,
          TIPI_E, TIPI_A, TIPI_C, TIPI_ES, TIPI_O,
          TIPI_E_Post, TIPI_A_Post, TIPI_C_Post, TIPI_ES_Post, TIPI_O_Post)
 
@@ -342,7 +348,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Mating Orientation
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, STMO, LTMO, Future_STMO, Future_LTMO)
+  select(A_Conc, STMO, LTMO, Future_STMO, Future_LTMO)
 
 res2[is.na(res2)] <- 0
 
@@ -354,7 +360,7 @@ corrplot(res2$r, type="upper", order="original",
 ### Mating Behavior
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, PSE_1:PSE_Fantas)
+  select(A_Conc, PSE_1:PSE_Fantas)
 
 res2[is.na(res2)] <- 0
 
@@ -367,7 +373,7 @@ corrplot(res2$r, type="upper", order="original",
 ### STAI
 ```{r}
 res2 <- Testo_F %>%
-  select(per_Diff_base_B_A, STAI_S, STAI_S_Post)
+  select(A_Conc, STAI_S, STAI_S_Post)
 
 res2[is.na(res2)] <- 0
 
