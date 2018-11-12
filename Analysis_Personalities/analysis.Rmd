@@ -21,35 +21,13 @@ library(Hmisc)
 
 ```{r}
 survey <- read_csv("../data/survey_tidy.csv") %>%
-  select(-X1)
+  select(-X1) %>%
+  filter(ID != "105C", ID != "113S", ID != "118C", ID != "146C", ID != "151C")
+
 survey_tsst <- survey %>%
   filter(TSST == "TSST")
 survey_control <- survey %>%
   filter(TSST == "Control")
-
-Cort <- read_csv("../data/Cortisol.csv") %>%
-  inner_join(survey) %>%
-  select(-X1)
-Cort_tsst <- Cort %>%
-  filter(tsst == "TSST")
-Cort_control <- Cort %>%
-  filter(tsst == "control")
-
-Testo_F <- read_csv("../data/Testosterone_F.csv") %>%
-  inner_join(survey) %>%
-  select(-X1)
-Testo_F_tsst <- Testo_F %>%
-  filter(tsst == "TSST")
-Testo_F_control <- Testo_F %>%
-  filter(tsst == "control")
-
-Testo_M <- read_csv("../data/Testosterone_M.csv") %>%
-  inner_join(survey) %>%
-  select(-X1)
-Testo_M_tsst <- Testo_M %>%
-  filter(tsst == "TSST")
-Testo_M_control <- Testo_M %>%
-  filter(tsst == "control")
 ```
 
 ## Big Five

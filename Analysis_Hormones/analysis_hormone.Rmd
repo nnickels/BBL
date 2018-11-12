@@ -149,7 +149,8 @@ relation <- full_join(subject, hormone, by = c("ID" = "Participant ID")) %>%
   arrange(ID, hormone, session) %>%
   mutate(lag_Conc = lag(Conc)) %>%
   # create a percentage change
-  mutate(per_diff = ifelse(session == "A",Diff,Diff/lag_Conc)) 
+  mutate(per_diff = ifelse(session == "A",Diff,Diff/lag_Conc)) %>%
+  filter(ID != "105C", ID != "113S", ID != "118C", ID != "146C", ID != "151C")
 ```
 
 ```{r, cache = TRUE, dependson = "tidying"}
