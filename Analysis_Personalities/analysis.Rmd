@@ -1,0 +1,181 @@
+---
+title: "Analysis - Hormone/BFI"
+author: "Wanitchaya Poonpatanapricha"
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
+
+library(tidyverse)
+library(knitr)
+library(broom)
+library(ggpmisc)
+library(rcompanion)
+library(knitr)
+library(broom)
+library(data.table)
+library(corrplot)
+library(Hmisc)
+```
+
+```{r}
+survey <- read_csv("data/survey_tidy.csv") %>%
+  select(-X1)
+survey_tsst <- survey %>%
+  filter(TSST == "TSST")
+survey_control <- survey %>%
+  filter(TSST == "Control")
+
+Cort <- read_csv("data/Cortisol.csv") %>%
+  inner_join(survey) %>%
+  select(-X1)
+Cort_tsst <- Cort %>%
+  filter(tsst == "TSST")
+Cort_control <- Cort %>%
+  filter(tsst == "control")
+
+Testo_F <- read_csv("data/Testosterone_F.csv") %>%
+  inner_join(survey) %>%
+  select(-X1)
+Testo_F_tsst <- Testo_F %>%
+  filter(tsst == "TSST")
+Testo_F_control <- Testo_F %>%
+  filter(tsst == "control")
+
+Testo_M <- read_csv("data/Testosterone_M.csv") %>%
+  inner_join(survey) %>%
+  select(-X1)
+Testo_M_tsst <- Testo_M %>%
+  filter(tsst == "TSST")
+Testo_M_control <- Testo_M %>%
+  filter(tsst == "control")
+```
+
+## Big Five
+```{r}
+ggplot(survey, aes(BFI_E)) +
+  geom_histogram()
+```
+```{r}
+ggplot(survey, aes(BFI_A)) +
+  geom_histogram()
+```
+```{r}
+ggplot(survey, aes(BFI_C)) +
+  geom_histogram()
+```
+```{r}
+ggplot(survey, aes(BFI_N)) +
+  geom_histogram()
+```
+```{r}
+ggplot(survey, aes(BFI_O)) +
+  geom_histogram()
+```
+
+
+## Big Five & TIPI
+* significantly correlated for all 5 dimensions
+```{r}
+res2 <- survey %>%
+  select(BFI_E, TIPI_E, TIPI_E_Post)
+
+res2 <- rcorr(as.matrix(res2))
+corrplot(res2$r, type="upper", order="original", 
+         p.mat = res2$P, sig.level = 0.05, insig = "label_sig")
+```
+
+```{r}
+res2 <- survey %>%
+  select(BFI_A, TIPI_A, TIPI_A_Post)
+
+res2 <- rcorr(as.matrix(res2))
+corrplot(res2$r, type="upper", order="original", 
+         p.mat = res2$P, sig.level = 0.05, insig = "label_sig")
+```
+
+```{r}
+res2 <- survey %>%
+  select(BFI_C, TIPI_C, TIPI_C_Post)
+
+res2 <- rcorr(as.matrix(res2))
+corrplot(res2$r, type="upper", order="original", 
+         p.mat = res2$P, sig.level = 0.05, insig = "label_sig")
+```
+
+```{r}
+res2 <- survey %>%
+  select(BFI_N, TIPI_ES, TIPI_ES_Post)
+
+res2 <- rcorr(as.matrix(res2))
+corrplot(res2$r, type="upper", order="original", 
+         p.mat = res2$P, sig.level = 0.05, insig = "label_sig")
+```
+
+```{r}
+res2 <- survey %>%
+  select(BFI_O, TIPI_O, TIPI_O_Post)
+
+res2 <- rcorr(as.matrix(res2))
+corrplot(res2$r, type="upper", order="original", 
+         p.mat = res2$P, sig.level = 0.05, insig = "label_sig")
+```
+
+
+
+
+
+## TIPI
+### Pre-post
+* no change in TIPI
+```{r}
+ggplot(survey, aes(x = TIPI_E, y = TIPI_E_Post, color = TSST), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point() 
+
+t.test(survey$TIPI_E_Post,survey$TIPI_E)
+t.test(survey_tsst$TIPI_E_Post,survey_tsst$TIPI_E)
+t.test(survey_control$TIPI_E_Post,survey_control$TIPI_E)
+```
+
+```{r}
+ggplot(survey, aes(x = TIPI_A, y = TIPI_A_Post, color = TSST), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point()
+
+t.test(survey$TIPI_A_Post,survey$TIPI_A)
+t.test(survey_tsst$TIPI_A_Post,survey_tsst$TIPI_A)
+t.test(survey_control$TIPI_A_Post,survey_control$TIPI_A)
+```
+
+```{r}
+ggplot(survey, aes(x = TIPI_C, y = TIPI_C_Post, color = TSST), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point()
+
+t.test(survey$TIPI_C_Post,survey$TIPI_C)
+t.test(survey_tsst$TIPI_C_Post,survey_tsst$TIPI_C)
+t.test(survey_control$TIPI_C_Post,survey_control$TIPI_C)
+```
+
+```{r}
+ggplot(survey, aes(x = TIPI_ES, y = TIPI_ES_Post, color = TSST), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point()
+
+t.test(survey$TIPI_ES_Post,survey$TIPI_ES)
+t.test(survey_tsst$TIPI_ES_Post,survey_tsst$TIPI_ES)
+t.test(survey_control$TIPI_ES_Post,survey_control$TIPI_ES)
+```
+
+```{r}
+ggplot(survey, aes(x = TIPI_O, y = TIPI_O_Post,color = TSST), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point()
+
+t.test(survey$TIPI_O_Post,survey$TIPI_O)
+t.test(survey_tsst$TIPI_O_Post,survey_tsst$TIPI_O)
+t.test(survey_control$TIPI_O_Post,survey_control$TIPI_O)
+```
+
