@@ -1,0 +1,325 @@
+---
+title: "Analysis - Hormones"
+author: "Wanitchaya Poonpatanapricha"
+output: github_document
+---
+
+```{r setup, include = F}
+# global setting
+knitr::opts_chunk$set(echo = FALSE, message = F, warning = F)
+options(warn = -1)
+
+# load libraries
+library(tidyverse)
+library(ggplot2)
+library(ggpmisc)
+library(rcompanion)
+library(knitr)
+library(broom)
+# setting theme for ggplot
+theme_set(theme_minimal())
+theme_update(text = element_text(family = "Times"))
+```
+
+```{r}
+# Functions to be used
+
+## ploting the mean of hormone concentration with 95% confidence interval
+## over 3 sessions, grouped by condition
+## input: dataframe that contain only the hormone in interest
+##        (either cortisol or testosterone)
+plot_repeated_meas <- function(hormone) {
+  # Calculate needed statistic
+  Sum = groupwiseMean(
+    Conc ~ tsst + session,
+    data   = hormone,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  )
+  # plot
+  ggplot(Sum, aes(session, Mean, color = tsst)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(.2)
+    ) +
+    geom_point(shape = 15,
+               size = 4,
+               position = position_dodge(.2)) +
+    labs(title = "",
+         y = "Concentration",
+         x = "Session") + 
+    scale_color_discrete(name = "")
+}
+
+plot_all <- function(hormone) {
+  # Calculate needed statistic
+  Sum = groupwiseMean(
+    Conc ~ session,
+    data   = hormone,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  )
+  # plot
+  ggplot(Sum, aes(session, Mean)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(.2)
+    ) +
+    geom_point(shape = 15,
+               size = 4,
+               position = position_dodge(.2)) +
+    labs(title = "",
+         y = "Concentration",
+         x = "Session")
+}
+```
+
+```{r raw_data,warning = FALSE, message = FALSE}
+## load the data
+
+# hormone concentration data
+hormone <- read_csv("../data/2018 Assay Data - Sheet1.csv")
+
+# the information of each subject
+subject <-
+  read_csv(
+    "../data/Participant Information _ Condition Spreadsheet - Participants.csv",
+    col_names = TRUE,
+    col_types = cols()
+  )
+
+```
+
+```{r tidying, cache = TRUE, dependson = "raw_data"}
+## Tidying and combining data
+
+# Tidying hormone data
+hormone <- hormone %>%
+  select(-"Participant #")
+
+# Tidying subject data
+subject <- subject %>%
+  slice(2:157) %>%
+  select("Participant #","Participant ID", "Condition # (1-8)", 
+         "Gender", "TSST/Control Condition", "Judges Sex") %>%
+  mutate(Gender = ifelse(Gender == "F","Female","Male"))
+colnames(subject) <- c("number","ID","condition","gender","tsst","judge_sex")
+subject <- mutate(subject,judge_sex = ifelse(judge_sex == "F","Female","Male"))
+
+# create a combined dataframe
+# each observation = each subject in each hormone in each session
+relation <- full_join(subject, hormone, by = c("ID" = "Participant ID")) %>%
+  select(number, everything(), -Cort_A_S1_Conc, -Cort_B_S1_Conc, -Cort_C_S1_Conc, 
+         -Cort_A_S2_Conc, -Cort_B_S2_Conc, -Cort_C_S2_Conc, -Testo_A_S1_Conc, 
+         -Testo_B_S1_Conc, -Testo_C_S1_Conc, -Testo_A_S2_Conc, -Testo_B_S2_Conc, -Testo_C_S2_Conc) %>%
+  # create a column contain difference of concentration between session
+  mutate(Diff_Cort_B_A = Cort_B_Conc - Cort_A_Conc,
+         Diff_Cort_C_B = Cort_C_Conc - Cort_B_Conc,
+         Diff_Testo_B_A = Testo_B_Conc - Testo_A_Conc,
+         Diff_Testo_C_B = Testo_C_Conc - Testo_B_Conc) %>%
+  unite("Cort", c(Cort_A_Conc, Cort_A_Std_Dev, "CV_(%)_Cort_A",
+                  Cort_B_Conc, Cort_B_Std_Dev, "CV_(%)_Cort_B",
+                  Cort_C_Conc, Cort_C_Std_Dev, "CV_(%)_Cort_C",
+                  Diff_Cort_B_A, Diff_Cort_C_B)) %>%
+  unite("Testo", c(Testo_A_Conc, Testo_A_Std_Dev, "CV_(%)_Testo_A",
+                  Testo_B_Conc, Testo_B_Std_Dev, "CV_(%)_Testo_B",
+                  Testo_C_Conc, Testo_C_Std_Dev, "CV_(%)_Testo_C",
+                  Diff_Testo_B_A, Diff_Testo_C_B)) %>%
+  gather(Cort, Testo, key = "hormone", value = "value") %>%
+  separate(value, into = c("A_Conc", "A_Std", "A_CV", 
+                           "B_Conc", "B_Std", "B_CV",
+                           "C_Conc", "C_Std", "C_CV",
+                           "Diff_B_A", "Diff_C_B"), sep = "_") %>%
+  mutate(Diff = A_Conc) %>%
+  unite("A", c("A_Conc", "A_Std", "A_CV", "Diff")) %>%
+  unite("B", c("B_Conc", "B_Std", "B_CV", "Diff_B_A")) %>%
+  unite("C", c("C_Conc", "C_Std", "C_CV", "Diff_C_B")) %>%
+  gather(A,B,C,key = "session", value = "value") %>%
+  separate(value, into = c("Conc", "Std", "CV", "Diff"), sep = "_", convert = T) %>%
+  arrange(ID, hormone, session) %>%
+  mutate(lag_Conc = lag(Conc)) %>%
+  # create a percentage change
+  mutate(per_diff = ifelse(session == "A",Diff,Diff/lag_Conc)) 
+```
+
+```{r, cache = TRUE, dependson = "tidying"}
+# Create a dataframe unique for each hormone/ each condition
+
+## Cortisol
+Cort <- relation %>%
+  filter(hormone == "Cort",!(is.na(Conc)))
+Cort_control <- Cort %>%
+  filter(tsst == "Control")
+
+# Cortisol daaframe for comparing percentage change
+Cort_per_diff <- Cort %>%
+  select(-Conc,-Std,-CV,-Diff, -lag_Conc) %>%
+  spread(session, value = per_diff) %>%
+  arrange(ID)
+Cort_per_diff_control <- Cort_per_diff %>%
+  filter(tsst == "Control")
+
+## Testosterone
+Testo <- relation %>%
+  filter(hormone == "Testo",!(is.na(Conc)))
+
+Testo_F <- Testo %>%
+  filter(gender == "Female")
+
+Testo_F_control <- Testo_F %>%
+  filter(tsst == "Control")
+
+Testo_M <- Testo %>%
+  filter(gender == "Male")
+
+Testo_M_control <- Testo_M %>%
+  filter(tsst == "Control")
+
+# Testosterone dataframe for comparing percentage change
+Testo_per_diff <- Testo %>%
+  select(-Conc,-Std,-CV,-Diff, -lag_Conc) %>%
+  spread(session, value = per_diff) %>%
+  arrange(ID)
+
+Testo_F_per_diff <- Testo_per_diff %>%
+  filter(gender == "Female")
+
+Testo_F_per_diff_control <- Testo_F_per_diff %>%
+  filter(tsst == "Control")
+
+Testo_M_per_diff <- Testo_per_diff %>%
+  filter(gender == "Male")
+
+Testo_M_per_diff_control <- Testo_M_per_diff %>%
+  filter(tsst == "Control")
+```
+
+## C - A
+### Cortisol
+#### Control
+* percentage change from baseline is not significant
+    
+```{r}
+Cort_control %>%
+  filter(session != "B") %>%
+  plot_all()
+  
+t.test(Cort_per_diff_control$C)
+```
+
+
+#### All
+* percentage change from baseline is not significant
+  
+```{r}
+Cort%>%
+  filter(session != "B") %>%
+  plot_all()
+
+t.test(Cort_per_diff$C)
+```
+
+
+### Testosterone Female
+#### Control
+* percentage change from baseline is not significant
+    
+```{r}
+Testo_F_control %>%
+  filter(session != "B") %>%
+  plot_all()
+  
+t.test(Testo_F_per_diff_control$C)
+```
+
+
+#### All
+* percentage change from baseline is not significant
+  
+```{r}
+Testo_F%>%
+  filter(session != "B") %>%
+  plot_all()
+
+t.test(Testo_F_per_diff$C)
+```
+
+
+### Testosterone Male
+#### Control
+* percentage change from baseline is not significant
+    
+```{r}
+Testo_M_control %>%
+  filter(session != "B") %>%
+  plot_all()
+  
+t.test(Testo_M_per_diff_control$C)
+```
+
+
+#### All
+* percentage change from baseline is not significant
+  
+```{r}
+Testo_M %>%
+  filter(session != "B") %>%
+  plot_all()
+
+t.test(Testo_M_per_diff$C)
+```
+
+## Tsst vs control
+### Cortisol
+
+```{r}
+plot_repeated_meas(Cort) +
+  labs(title = "Cortisol Concentration by Condition",
+       y = "Cortisol Concentration")
+```
+
+```{r}
+# Multiple linear regression
+lm_c <- lm(data = Cort, Conc ~ session + tsst + session*tsst)
+kable( tidy(lm_c) )
+kable( glance(lm_c)[1:6] )
+kable( anova(lm_c) )
+```
+
+
+### Testosterone
+#### Female
+```{r}
+plot_repeated_meas(Testo_F)
+```
+
+```{r}
+# Multiple linear regression
+lm_t <- lm(data = Testo_F, Conc ~ session + tsst + session*tsst)
+kable( tidy(lm_t) )
+kable( glance(lm_t)[1:6] )
+kable( anova(lm_t) )
+```
+
+#### Male
+```{r}
+plot_repeated_meas(Testo_M)
+```
+
+```{r}
+# Multiple linear regression
+lm_t <- lm(data = Testo_M, Conc ~ session + tsst + session*tsst)
+kable( tidy(lm_t) )
+kable( glance(lm_t)[1:6] )
+kable( anova(lm_t) )
+```
