@@ -1,4 +1,4 @@
-Analysis - Hormone/BFI
+Analysis - BFI
 ================
 Wanitchaya Poonpatanapricha
 
@@ -10,7 +10,7 @@ Big Five
 Big Five & TIPI
 ---------------
 
--   significantly correlated for all 5 dimensions ![](analysis_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](analysis_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 ![](analysis_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
@@ -68,151 +68,151 @@ TIPI
 ![](analysis_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey$TIPI_A_Post and survey$TIPI_A
-    ## t = 0.89288, df = 305.13, p-value = 0.3726
+    ## t = 1.8127, df = 153, p-value = 0.07185
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.2970498  0.7905563
+    ##  -0.02217988  0.51568638
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.67532  10.42857
+    ## mean of the differences 
+    ##               0.2467532
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_tsst$TIPI_A_Post and survey_tsst$TIPI_A
-    ## t = 0.36466, df = 150.88, p-value = 0.7159
+    ## t = 0.6748, df = 76, p-value = 0.5019
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.6885554  1.0002437
+    ##  -0.3041300  0.6158183
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.40260  10.24675
+    ## mean of the differences 
+    ##               0.1558442
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_control$TIPI_A_Post and survey_control$TIPI_A
-    ## t = 0.96662, df = 152, p-value = 0.3353
+    ## t = 2.327, df = 76, p-value = 0.02263
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.3524952  1.0278199
+    ##  0.04865573 0.62666894
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.94805  10.61039
+    ## mean of the differences 
+    ##               0.3376623
 
 ![](analysis_files/figure-markdown_github/unnamed-chunk-15-1.png)
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey$TIPI_C_Post and survey$TIPI_C
-    ## t = -0.41028, df = 305.37, p-value = 0.6819
+    ## t = -0.92857, df = 153, p-value = 0.3546
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.7903824  0.5176551
+    ##  -0.4264858  0.1537586
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.38312  10.51948
+    ## mean of the differences 
+    ##              -0.1363636
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_tsst$TIPI_C_Post and survey_tsst$TIPI_C
-    ## t = -0.88073, df = 149.36, p-value = 0.3799
+    ## t = -1.7224, df = 76, p-value = 0.08907
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -1.347978  0.516809
+    ##  -0.89615002  0.06498119
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.15584  10.57143
+    ## mean of the differences 
+    ##              -0.4155844
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_control$TIPI_C_Post and survey_control$TIPI_C
-    ## t = 0.3041, df = 151.64, p-value = 0.7615
+    ## t = 0.87657, df = 76, p-value = 0.3835
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.7852961  1.0710104
+    ##  -0.1817299  0.4674442
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.61039  10.46753
+    ## mean of the differences 
+    ##               0.1428571
 
 ![](analysis_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey$TIPI_ES_Post and survey$TIPI_ES
-    ## t = 0.64979, df = 305.82, p-value = 0.5163
+    ## t = 1.639, df = 153, p-value = 0.1033
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.4609782  0.9155237
+    ##  -0.04667122  0.50121667
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  9.571429  9.344156
+    ## mean of the differences 
+    ##               0.2272727
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_tsst$TIPI_ES_Post and survey_tsst$TIPI_ES
-    ## t = 0.39788, df = 150.14, p-value = 0.6913
+    ## t = 0.83558, df = 76, p-value = 0.406
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.7726023  1.1622127
+    ##  -0.2695310  0.6591414
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  8.922078  8.727273
+    ## mean of the differences 
+    ##               0.1948052
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_control$TIPI_ES_Post and survey_control$TIPI_ES
-    ## t = 0.53956, df = 151.28, p-value = 0.5903
+    ## t = 1.7113, df = 76, p-value = 0.0911
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.6913785  1.2108591
+    ##  -0.04254649  0.56202701
     ## sample estimates:
-    ## mean of x mean of y 
-    ## 10.220779  9.961039
+    ## mean of the differences 
+    ##               0.2597403
 
 ![](analysis_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey$TIPI_O_Post and survey$TIPI_O
-    ## t = -0.45221, df = 303.4, p-value = 0.6514
+    ## t = -0.83844, df = 153, p-value = 0.4031
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.6255065  0.3917403
+    ##  -0.3922897  0.1585234
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.70779  10.82468
+    ## mean of the differences 
+    ##              -0.1168831
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_tsst$TIPI_O_Post and survey_tsst$TIPI_O
-    ## t = -0.38625, df = 149.42, p-value = 0.6999
+    ## t = -0.75684, df = 76, p-value = 0.4515
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.9531155  0.6414272
+    ##  -0.5659588  0.2542705
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.55844  10.71429
+    ## mean of the differences 
+    ##              -0.1558442
 
     ## 
-    ##  Welch Two Sample t-test
+    ##  Paired t-test
     ## 
     ## data:  survey_control$TIPI_O_Post and survey_control$TIPI_O
-    ## t = -0.24015, df = 151.86, p-value = 0.8105
+    ## t = -0.4118, df = 76, p-value = 0.6816
     ## alternative hypothesis: true difference in means is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.7189807  0.5631365
+    ##  -0.4547920  0.2989478
     ## sample estimates:
-    ## mean of x mean of y 
-    ##  10.85714  10.93506
+    ## mean of the differences 
+    ##             -0.07792208
