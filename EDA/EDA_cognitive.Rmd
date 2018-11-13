@@ -1,0 +1,261 @@
+---
+title: "EDA Cognitive"
+output:
+  github_document: 
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+# global setting
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+
+# load libraries
+library(tidyverse)
+library(ggplot2)
+library(ggpmisc)
+library(rcompanion)
+library(knitr)
+library(broom)
+library(data.table)
+# setting theme for ggplot
+theme_set(theme_minimal())
+theme_update(text = element_text(family = "Times"))
+```
+
+```{r}
+Flanker_A <- read_csv("../data/Flanker_A_pivot.csv") %>%
+  select(ID:RT_TOTAL, -(RT_TIME_CON:RT_TIME_TOTAL)) %>%
+  mutate(session = "A") 
+Flanker_B <- read_csv("../data/Flanker_B_pivot.csv") %>%
+  select(ID:RT_TOTAL) %>%
+  mutate(session = "B")
+Flanker_C <- read_csv("../data/Flanker_C_pivot.csv") %>%
+  select(ID:RT_TOTAL, -(RT_TIME_CON:RT_TIME_TOTAL)) %>%
+  mutate(session = "C") 
+
+Flanker <- Flanker_A %>%
+  rbind(Flanker_B) %>%
+  rbind(Flanker_C) %>%
+  arrange(ID) %>%
+  filter(ID != 105, ID != 113, ID != 118, ID != 143)
+```
+
+```{r}
+sum_table <- function(var, sess = NA){
+  if (!is.na(sess)){
+    df <- Flanker %>%
+      filter(session == sess)
+  }
+  rv <- summarise(df,
+                  n = n(),
+                  mean = mean(var, na.rm = T),
+                  sd = sd(var, na.rm = T),
+                  min = min(var, na.rm = T),
+                  median = median(var, na.rm = T),
+                  max = max(var, na.rm = T)
+                  )
+  return(rv)
+}
+```
+
+
+## Flanker A
+
+### ACC
+#### ACC_TOTAL
+```{r}
+kable(sum_table(Flanker$ACC_TOTAL, "A"))
+```
+
+```{r}
+ggplot(Flanker_A, aes(ACC_TOTAL)) +
+    geom_histogram()
+```
+
+#### ACC_CON
+
+```{r}
+kable(sum_table(Flanker$ACC_CON, "A"))
+```
+
+```{r}
+ggplot(Flanker_A, aes(ACC_CON)) +
+    geom_histogram()
+```
+
+#### ACC_INCON
+```{r}
+kable(sum_table(Flanker$ACC_INCON, "A"))
+```
+
+```{r}
+ggplot(Flanker_A, aes(ACC_INCON)) +
+    geom_histogram()
+```
+
+### RT
+#### RT_TOTAL
+```{r}
+kable(sum_table(Flanker$RT_TOTAL, "A"))
+```
+
+```{r}
+ggplot(Flanker_A, aes(RT_TOTAL)) +
+    geom_histogram()
+```
+
+#### RT_CON
+
+```{r}
+kable(sum_table(Flanker$RT_CON, "A"))
+```
+
+```{r}
+ggplot(Flanker_A, aes(RT_CON)) +
+    geom_histogram()
+```
+
+#### RT_INCON
+```{r}
+kable(sum_table(Flanker$RT_INCON, "A"))
+```
+
+```{r}
+ggplot(Flanker_A, aes(RT_INCON)) +
+    geom_histogram()
+```
+
+
+## Flanker B
+
+### ACC
+#### ACC_TOTAL
+```{r}
+kable(sum_table(Flanker$ACC_TOTAL, "B"))
+```
+
+```{r}
+ggplot(Flanker_B, aes(ACC_TOTAL)) +
+    geom_histogram()
+```
+
+#### ACC_CON
+
+```{r}
+kable(sum_table(Flanker$ACC_CON, "B"))
+```
+
+```{r}
+ggplot(Flanker_B, aes(ACC_CON)) +
+    geom_histogram()
+```
+
+#### ACC_INCON
+```{r}
+kable(sum_table(Flanker$ACC_INCON, "B"))
+```
+
+```{r}
+ggplot(Flanker_B, aes(ACC_INCON)) +
+    geom_histogram()
+```
+
+### RT
+#### RT_TOTAL
+```{r}
+kable(sum_table(Flanker$RT_TOTAL, "B"))
+```
+
+```{r}
+ggplot(Flanker_B, aes(RT_TOTAL)) +
+    geom_histogram()
+```
+
+#### RT_CON
+
+```{r}
+kable(sum_table(Flanker$RT_CON, "B"))
+```
+
+```{r}
+ggplot(Flanker_B, aes(RT_CON)) +
+    geom_histogram()
+```
+
+#### RT_INCON
+```{r}
+kable(sum_table(Flanker$RT_INCON, "B"))
+```
+
+```{r}
+ggplot(Flanker_B, aes(RT_INCON)) +
+    geom_histogram()
+```
+
+
+## Flanker C
+
+### ACC
+#### ACC_TOTAL
+```{r}
+kable(sum_table(Flanker$ACC_TOTAL, "C"))
+```
+
+```{r}
+ggplot(Flanker_C, aes(ACC_TOTAL)) +
+    geom_histogram()
+```
+
+#### ACC_CON
+
+```{r}
+kable(sum_table(Flanker$ACC_CON, "C"))
+```
+
+```{r}
+ggplot(Flanker_C, aes(ACC_CON)) +
+    geom_histogram()
+```
+
+#### ACC_INCON
+```{r}
+kable(sum_table(Flanker$ACC_INCON, "C"))
+```
+
+```{r}
+ggplot(Flanker_C, aes(ACC_INCON)) +
+    geom_histogram()
+```
+
+### RT
+#### RT_TOTAL
+```{r}
+kable(sum_table(Flanker$RT_TOTAL, "C"))
+```
+
+```{r}
+ggplot(Flanker_C, aes(RT_TOTAL)) +
+    geom_histogram()
+```
+
+#### RT_CON
+
+```{r}
+kable(sum_table(Flanker$RT_CON, "C"))
+```
+
+```{r}
+ggplot(Flanker_C, aes(RT_CON)) +
+    geom_histogram()
+```
+
+#### RT_INCON
+```{r}
+kable(sum_table(Flanker$RT_INCON, "C"))
+```
+
+```{r}
+ggplot(Flanker_C, aes(RT_INCON)) +
+    geom_histogram()
+```

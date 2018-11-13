@@ -25,8 +25,8 @@ theme_update(text = element_text(family = "Times"))
 
 ```{r,warning = FALSE, message = FALSE}
 ## load the data
-survey <- read_csv("data/survey.csv") %>%
-  select("Participant ID", Gender, "TSST/Control Condition", age, colorblind,
+survey <- read_csv("../data/survey.csv") %>%
+  select("Participant #","Participant ID", Gender, "TSST/Control Condition", age, colorblind,
          rMEQ_1_5, rMEQ_6, AQ, Anx_T, ACE, Lon, Attractive_by_conf:reveal_detail_by_conf,
          eat_drink:Dem_Sexual_Activity, BFI_E, BFI_A, BFI_C, BFI_N, BFI_O,
          Mac_SS, TIPI_E, TIPI_A, TIPI_C, TIPI_ES, TIPI_O, sMARS, STMO, LTMO,
@@ -34,8 +34,8 @@ survey <- read_csv("data/survey.csv") %>%
          TIPI_E_Post, TIPI_A_Post, TIPI_C_Post, TIPI_ES_Post, TIPI_O_Post,
          Imp_Attr:Imp_Like) %>%
   slice(2:157) %>%
-  setnames(old=c("Participant ID","TSST/Control Condition"), new=c("ID", "TSST")) %>%
-  filter(ID != "105C", ID != "113s", ID != "118C") %>%
+  setnames(old=c("Participant #","Participant ID","TSST/Control Condition"), new=c("number","ID", "TSST")) %>%
+  filter(ID != "105C", ID != "113S", ID != "118C") %>%
   mutate_at(.vars = vars(age, rMEQ_6,Attractive_by_conf:is_worry_today, sleep_hrs_last_night,
                          exercise, Dem_Age, Dem_Gen, Dem_SO, Dem_Trans, Dem_Eth, Dem_Marr,
                          Dem_Educ,Dem_Raised, Dem_Smoke:Dem_Contra, Dem_Inc:Dem_Child,

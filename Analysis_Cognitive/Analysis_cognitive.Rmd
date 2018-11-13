@@ -1,0 +1,403 @@
+---
+title: "Analysis Cognitive"
+output:
+  github_document: 
+    toc: true
+    toc_depth: 3
+---
+
+
+```{r setup, include=FALSE}
+# global setting
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+
+# load libraries
+library(MASS)
+library(tidyverse)
+library(ggplot2)
+library(ggpmisc)
+library(rcompanion)
+library(knitr)
+library(broom)
+library(data.table)
+
+# setting theme for ggplot
+theme_set(theme_minimal())
+theme_update(text = element_text(family = "Times"))
+```
+
+
+```{r}
+survey <- read_csv("../data/survey_tidy.csv")
+
+
+Flanker_A <- read_csv("../data/Flanker_A_pivot.csv") %>%
+  select(ID:RT_TOTAL, -(RT_TIME_CON:RT_TIME_TOTAL)) %>%
+  mutate(session = "A") 
+Flanker_B <- read_csv("../data/Flanker_B_pivot.csv") %>%
+  select(ID:RT_TOTAL) %>%
+  mutate(session = "B")
+Flanker_C <- read_csv("../data/Flanker_C_pivot.csv") %>%
+  select(ID:RT_TOTAL, -(RT_TIME_CON:RT_TIME_TOTAL)) %>%
+  mutate(session = "C") 
+
+Flanker_obs <- Flanker_A %>%
+  rbind(Flanker_B) %>%
+  rbind(Flanker_C) %>%
+  arrange(ID) %>%
+  full_join(survey, by = c("ID" = "number")) %>%
+  filter(ID != 105, ID != 113, ID != 118, ID != 143)   
+
+
+
+Flanker_A <- read_csv("../data/Flanker_A_pivot.csv") %>%
+  select(ID:RT_TOTAL, -(RT_TIME_CON:RT_TIME_TOTAL))
+colnames(Flanker_A) <- c("ID", "A_ACC_CON", "A_ACC_INCON", "A_ACC_TOTAL",
+                         "A_RT_CON", "A_RT_INCON", "A_RT_TOTAL") 
+
+Flanker_B <- read_csv("../data/Flanker_B_pivot.csv") %>%
+  select(ID:RT_TOTAL) 
+colnames(Flanker_B) <- c("ID", "B_ACC_CON", "B_ACC_INCON", "B_ACC_TOTAL",
+                         "B_RT_CON", "B_RT_INCON", "B_RT_TOTAL") 
+
+Flanker_C <- read_csv("../data/Flanker_C_pivot.csv") %>%
+  select(ID:RT_TOTAL, -(RT_TIME_CON:RT_TIME_TOTAL)) 
+colnames(Flanker_C) <- c("ID", "C_ACC_CON", "C_ACC_INCON", "C_ACC_TOTAL",
+                         "C_RT_CON", "C_RT_INCON", "C_RT_TOTAL") 
+
+
+Flanker <- Flanker_A %>%
+  full_join(Flanker_B) %>%
+  full_join(Flanker_C) %>%
+  full_join(survey, by = c("ID" = "number")) %>%
+  filter(ID != 105, ID != 113, ID != 118, ID != 143) %>%
+  arrange(ID) %>%
+  select(-X1) %>%
+  mutate(BA_RT_CON = B_RT_CON - A_RT_CON,
+         CA_RT_CON = C_RT_CON - A_RT_CON,
+         CB_RT_CON = C_RT_CON - B_RT_CON,
+         BA_RT_INCON = B_RT_INCON - A_RT_INCON,
+         CA_RT_INCON = C_RT_INCON - A_RT_INCON,
+         CB_RT_INCON = C_RT_INCON - B_RT_INCON,
+         BA_RT_TOTAL = B_RT_TOTAL - A_RT_TOTAL,
+         CA_RT_TOTAL = C_RT_TOTAL - A_RT_TOTAL,
+         CB_RT_TOTAL = C_RT_TOTAL - B_RT_TOTAL,
+         per_BA_RT_CON = BA_RT_CON/A_RT_CON*100,
+         per_CA_RT_CON = CA_RT_CON/A_RT_CON*100,
+         per_CB_RT_CON = CB_RT_CON/B_RT_CON*100,
+         per_BA_RT_INCON = BA_RT_INCON/A_RT_INCON*100,
+         per_CA_RT_INCON = CA_RT_INCON/A_RT_INCON*100,
+         per_CB_RT_INCON = CB_RT_INCON/B_RT_INCON*100,
+         per_BA_RT_TOTAL = BA_RT_CON/A_RT_TOTAL*100,
+         per_CA_RT_TOTAL = CA_RT_TOTAL/A_RT_TOTAL*100,
+         per_CB_RT_TOTAL = CB_RT_TOTAL/B_RT_TOTAL*100) %>%
+  mutate(BA_ACC_CON = B_ACC_CON - A_ACC_CON,
+         CA_ACC_CON = C_ACC_CON - A_ACC_CON,
+         CB_ACC_CON = C_ACC_CON - B_ACC_CON,
+         BA_ACC_INCON = B_ACC_INCON - A_ACC_INCON,
+         CA_ACC_INCON = C_ACC_INCON - A_ACC_INCON,
+         CB_ACC_INCON = C_ACC_INCON - B_ACC_INCON,
+         BA_ACC_TOTAL = B_ACC_TOTAL - A_ACC_TOTAL,
+         CA_ACC_TOTAL = C_ACC_TOTAL - A_ACC_TOTAL,
+         CB_ACC_TOTAL = C_ACC_TOTAL - B_ACC_TOTAL,
+         per_BA_ACC_CON = BA_ACC_CON/A_ACC_CON*100,
+         per_CA_ACC_CON = CA_ACC_CON/A_ACC_CON*100,
+         per_CB_ACC_CON = CB_ACC_CON/B_ACC_CON*100,
+         per_BA_ACC_INCON = BA_ACC_INCON/A_ACC_INCON*100,
+         per_CA_ACC_INCON = CA_ACC_INCON/A_ACC_INCON*100,
+         per_CB_ACC_INCON = CB_ACC_INCON/B_ACC_INCON*100,
+         per_BA_ACC_TOTAL = BA_ACC_CON/A_ACC_TOTAL*100,
+         per_CA_ACC_TOTAL = CA_ACC_TOTAL/A_ACC_TOTAL*100,
+         per_CB_ACC_TOTAL = CB_ACC_TOTAL/B_ACC_TOTAL*100)
+```
+
+
+
+## Raw data
+### All session
+```{r}
+plot_by_tsst <- function(var){
+sum <- groupwiseMean(
+    as.formula(paste0("A_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  ) %>%
+  mutate(Var = 'A') %>%
+  rbind(
+    groupwiseMean(
+    as.formula(paste0("B_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+    ) %>%
+    mutate(Var = 'B')
+  ) %>%
+  rbind(
+    groupwiseMean(
+    as.formula(paste0("C_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+    ) %>%
+    mutate(Var = 'C')
+  ) %>%
+  select(Var, everything())
+  
+  ggplot(sum, aes(Var, Mean, color = TSST, group = TSST)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(.2)
+    ) +
+    geom_point(shape = 15,
+               size = 4,
+               position = position_dodge(.2)) +
+    labs(title = "",
+         y = var,
+         x = "Session") + 
+    scale_color_discrete(name = "") +
+    geom_line(position = position_dodge(.2))
+}
+
+
+
+
+```
+
+```{r}
+plot_by_tsst("RT_TOTAL")
+fm <- aov(RT_TOTAL ~ session * TSST, data = Flanker_obs)
+summary(fm)
+
+plot_by_tsst("RT_CON")
+fm <- aov(RT_CON ~ session * TSST, data = Flanker_obs)
+summary(fm)
+
+plot_by_tsst("RT_INCON")
+fm <- aov(RT_INCON ~ session * TSST, data = Flanker_obs)
+summary(fm)
+
+plot_by_tsst("ACC_TOTAL")
+fm <- aov(ACC_TOTAL ~ session * TSST, data = Flanker_obs)
+summary(fm)
+
+plot_by_tsst("ACC_CON")
+fm <- aov(ACC_CON ~ session * TSST, data = Flanker_obs)
+summary(fm)
+
+plot_by_tsst("ACC_INCON")
+fm <- aov(ACC_INCON ~ session * TSST, data = Flanker_obs)
+summary(fm)
+
+```
+
+### A - B
+```{r}
+plot_by_tsst <- function(var){
+sum <- groupwiseMean(
+    as.formula(paste0("A_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  ) %>%
+  mutate(Var = 'A') %>%
+  rbind(
+    groupwiseMean(
+    as.formula(paste0("B_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+    ) %>%
+    mutate(Var = 'B')
+  ) %>%
+  select(Var, everything())
+  
+  ggplot(sum, aes(Var, Mean, color = TSST, group = TSST)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(.2)
+    ) +
+    geom_point(shape = 15,
+               size = 4,
+               position = position_dodge(.2)) +
+    labs(title = "",
+         y = var,
+         x = "Session") + 
+    scale_color_discrete(name = "") +
+    geom_line(position = position_dodge(.2))
+}
+```
+
+```{r}
+Flanker_obs_AB <- Flanker_obs %>%
+  filter(session != "C")
+
+plot_by_tsst("RT_TOTAL")
+fm <- aov(RT_TOTAL ~ session * TSST, data = Flanker_obs_AB)
+summary(fm)
+
+plot_by_tsst("RT_CON")
+fm <- aov(RT_CON ~ session * TSST, data = Flanker_obs_AB)
+summary(fm)
+
+plot_by_tsst("RT_INCON")
+fm <- aov(RT_INCON ~ session * TSST, data = Flanker_obs_AB)
+summary(fm)
+
+plot_by_tsst("ACC_TOTAL")
+fm <- aov(ACC_TOTAL ~ session * TSST, data = Flanker_obs_AB)
+summary(fm)
+
+plot_by_tsst("ACC_CON")
+fm <- aov(ACC_CON ~ session * TSST, data = Flanker_obs_AB)
+summary(fm)
+
+plot_by_tsst("ACC_INCON")
+fm <- aov(ACC_INCON ~ session * TSST, data = Flanker_obs_AB)
+summary(fm)
+
+```
+
+## Raw Change
+```{r}
+plot_diff <- function(var){
+sum <- groupwiseMean(
+    as.formula(paste0("BA_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  ) %>%
+  mutate(Var = 'BA') %>%
+  rbind(
+    groupwiseMean(
+    as.formula(paste0("CA_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+    ) %>%
+    mutate(Var = 'CA')
+  ) %>%
+  rbind(
+    groupwiseMean(
+    as.formula(paste0("CB_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+    ) %>%
+    mutate(Var = 'CB')
+  ) %>%
+  select(Var, everything())
+  
+  ggplot(sum, aes(Var, Mean, fill = TSST)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(0.9)
+    ) +
+    geom_bar(position = "dodge", stat = "identity", alpha = 0.5) +
+    labs(title = "",
+         y = var,
+         x = "Session") + 
+    scale_color_discrete(name = "")
+}
+```
+
+```{r}
+plot_diff("RT_TOTAL")
+
+plot_diff("RT_CON")
+
+plot_diff("RT_INCON")
+
+
+plot_diff("ACC_TOTAL")
+
+plot_diff("ACC_CON")
+
+plot_diff("ACC_INCON")
+```
+
+## Percentage Change
+```{r}
+plot_per_diff <- function(var){
+sum <- groupwiseMean(
+    as.formula(paste0("per_BA_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  ) %>%
+  mutate(Var = 'BA') %>%
+  rbind(
+    groupwiseMean(
+    as.formula(paste0("per_CA_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+    ) %>%
+    mutate(Var = 'CA')
+  ) %>%
+  rbind(
+    groupwiseMean(
+    as.formula(paste0("per_CB_",var," ~ TSST")),
+    data   = Flanker,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+    ) %>%
+    mutate(Var = 'CB')
+  ) %>%
+  select(Var, everything())
+  
+  ggplot(sum, aes(Var, Mean, fill = TSST)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(0.9)
+    ) +
+    geom_bar(position = "dodge", stat = "identity", alpha = 0.5) +
+    labs(title = "",
+         y = var,
+         x = "Session") + 
+    scale_color_discrete(name = "")
+}
+```
+
+```{r}
+plot_per_diff("RT_TOTAL")
+
+plot_per_diff("RT_CON")
+
+plot_per_diff("RT_INCON")
+
+
+plot_per_diff("ACC_TOTAL")
+
+plot_per_diff("ACC_CON")
+
+plot_per_diff("ACC_INCON")
+```
+

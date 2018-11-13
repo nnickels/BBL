@@ -42,22 +42,6 @@ Tsst vs control
 
 ![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
-    ##               Df Sum Sq Mean Sq F value   Pr(>F)    
-    ## session        2  0.033  0.0166   0.626 0.535624    
-    ## tsst           1  0.441  0.4413  16.643 5.67e-05 ***
-    ## rMEQ_1_5       1  0.518  0.5177  19.525 1.35e-05 ***
-    ## sMARS          1  0.620  0.6197  23.371 2.06e-06 ***
-    ## Dem_RelTerm    1  0.493  0.4932  18.599 2.14e-05 ***
-    ## Dem_RelStab    1  0.051  0.0505   1.906 0.168331    
-    ## Dem_Commit     1  0.309  0.3088  11.646 0.000724 ***
-    ## session:tsst   2  0.059  0.0293   1.103 0.333017    
-    ## Residuals    328  8.697  0.0265                     
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 114 observations deleted due to missingness
-
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-10-2.png)
-
 ![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
     ##               Df Sum Sq Mean Sq F value   Pr(>F)    
@@ -74,9 +58,13 @@ Tsst vs control
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 114 observations deleted due to missingness
 
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-11-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-11-3.png)
+
 ### Testosterone
 
 #### Female
+
+-   May need to use sqrt instead of log
 
 ![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
@@ -92,7 +80,7 @@ Tsst vs control
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-12-2.png)
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-12-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-12-3.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-12-4.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-12-5.png)
 
 ![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-13-1.png)
 
@@ -108,24 +96,27 @@ Tsst vs control
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-#### Male
-
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-13-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-13-3.png)
 
     ##               Df Sum Sq Mean Sq F value   Pr(>F)    
-    ## session        2   2542    1271   0.327 0.721890    
-    ## tsst           1  30066   30066   7.724 0.006081 ** 
-    ## eat_drink      1  62292   62292  16.004 9.53e-05 ***
-    ## Dem_Smoke      1  80299   80299  20.630 1.07e-05 ***
-    ## LTMO           1  47412   47412  12.181 0.000619 ***
-    ## session:tsst   2   2059    1029   0.264 0.767955    
-    ## Residuals    165 642238    3892                     
+    ## session        2    2.4    1.20   0.769  0.46450    
+    ## tsst           1    0.0    0.02   0.013  0.90864    
+    ## eat_drink      1   15.2   15.21   9.730  0.00201 ** 
+    ## Dem_Contra     1   42.3   42.33  27.073 3.89e-07 ***
+    ## BFI_C          1   26.0   26.01  16.638 5.97e-05 ***
+    ## TIPI_O         1   17.0   16.99  10.869  0.00111 ** 
+    ## session:tsst   2    0.1    0.05   0.030  0.97089    
+    ## Residuals    269  420.6    1.56                     
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-14-2.png)
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-14-1.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-14-2.png)
+
+#### Male
 
 ![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-15-1.png)
+
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
     ##               Df Sum Sq Mean Sq F value   Pr(>F)    
     ## session        2  0.037  0.0185   0.147 0.863479    
@@ -138,34 +129,16 @@ Tsst vs control
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-16-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-16-3.png)
+
 By Time slot
 ------------
 
 ### Cortisol
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-17-1.png)
-
-    ##                    Df Sum Sq Mean Sq F value   Pr(>F)    
-    ## session             2  0.033  0.0166   0.618 0.539611    
-    ## tsst                1  0.441  0.4413  16.446 6.31e-05 ***
-    ## time                2  0.129  0.0645   2.402 0.092165 .  
-    ## rMEQ_1_5            1  0.428  0.4281  15.956 8.07e-05 ***
-    ## sMARS               1  0.632  0.6320  23.554 1.91e-06 ***
-    ## Dem_RelTerm         1  0.523  0.5225  19.474 1.40e-05 ***
-    ## Dem_RelStab         1  0.066  0.0658   2.451 0.118486    
-    ## Dem_Commit          1  0.304  0.3040  11.330 0.000857 ***
-    ## session:tsst        2  0.059  0.0293   1.090 0.337409    
-    ## session:time        4  0.019  0.0049   0.181 0.947933    
-    ## tsst:time           2  0.085  0.0425   1.583 0.206949    
-    ## session:tsst:time   4  0.022  0.0055   0.205 0.935658    
-    ## Residuals         316  8.479  0.0268                     
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 114 observations deleted due to missingness
-
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-17-2.png)
-
 ![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-19-1.png)
 
     ##                    Df Sum Sq Mean Sq F value   Pr(>F)    
     ## session             2   0.60   0.301   0.955 0.385826    
@@ -185,11 +158,15 @@ By Time slot
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 114 observations deleted due to missingness
 
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-19-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-19-3.png)
+
 ### Testosterone
 
 #### Female
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-19-1.png)
+-   May need sqrt
+
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-20-1.png)
 
     ##                    Df Sum Sq Mean Sq F value   Pr(>F)    
     ## session             2    425     213   0.682 0.506387    
@@ -207,9 +184,9 @@ By Time slot
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-19-2.png)
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-20-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-20-3.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-20-4.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-20-5.png)
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
     ##                    Df Sum Sq Mean Sq F value   Pr(>F)    
     ## session             2   0.25  0.1233   0.890  0.41210    
@@ -227,28 +204,31 @@ By Time slot
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-#### Male
-
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-21-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-21-3.png)
 
     ##                    Df Sum Sq Mean Sq F value   Pr(>F)    
-    ## session             2   2542    1271   0.329 0.720335    
-    ## tsst                1  30066   30066   7.777 0.005965 ** 
-    ## time                2  28646   14323   3.705 0.026840 *  
-    ## eat_drink           1  78266   78266  20.244 1.34e-05 ***
-    ## Dem_Smoke           1  56592   56592  14.638 0.000189 ***
-    ## LTMO                1  49345   49345  12.763 0.000473 ***
-    ## session:tsst        2   2059    1029   0.266 0.766607    
-    ## session:time        4   5315    1329   0.344 0.848106    
-    ## tsst:time           2  19026    9513   2.461 0.088760 .  
-    ## session:tsst:time   4   3537     884   0.229 0.921939    
-    ## Residuals         153 591514    3866                     
+    ## session             2    2.4    1.20   0.813  0.44476    
+    ## tsst                1    0.0    0.02   0.014  0.90609    
+    ## time                2   55.1   27.54  18.619 2.81e-08 ***
+    ## eat_drink           1    9.8    9.83   6.648  0.01048 *  
+    ## Dem_Contra          1   31.7   31.71  21.436 5.81e-06 ***
+    ## BFI_C               1   24.1   24.06  16.263 7.27e-05 ***
+    ## TIPI_O              1   15.3   15.28  10.329  0.00148 ** 
+    ## session:tsst        2    0.1    0.05   0.031  0.96926    
+    ## session:time        4    0.2    0.05   0.032  0.99801    
+    ## tsst:time           2    3.3    1.66   1.126  0.32605    
+    ## session:tsst:time   4    1.5    0.37   0.249  0.90998    
+    ## Residuals         257  380.2    1.48                     
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-21-2.png)
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-22-1.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-22-2.png)
 
-![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-22-1.png)
+#### Male
+
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-23-1.png)
+
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-24-1.png)
 
     ##                    Df Sum Sq Mean Sq F value  Pr(>F)   
     ## session             2  0.037  0.0185   0.149 0.86196   
@@ -264,3 +244,5 @@ By Time slot
     ## Residuals         153 19.001  0.1242                   
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-24-2.png)![](analysis_hormone_files/figure-markdown_github/unnamed-chunk-24-3.png)
