@@ -1,0 +1,462 @@
+---
+title: The effects of brief social interactions and acute psychosocial stress on cognition,
+  hormones, and courtship behavior in men and women
+author: "Wanitchaya Poonpatanapricha"
+date: "10/29/2018"
+output:
+  github_document: 
+    toc: true
+    toc_depth: 3
+---
+
+\newpage
+
+# Introduction
+Human social endocrinology research has shown that hormones are sensitive to social stimuli and may show predictable fluctuations in situations in which individuals briefly interact with others. However, we know that during human social interactions, hormonal physiology is also interacting simultaneously with human cognition and stress responsivity to produce behavioral outputs that serve to function in an adaptively beneficial way during the relevant social interaction at hand. Additionally, individual differences in human personality traits may also be interconnected with the physiological and cognitive processes at play during social interactions. In our lab, past studies have shown that by manipulating the physiological and social context during a human social interaction, we can measure how brief social interactions affect endocrine function and behavior in male and female participants. In particular, one social interaction in which endocrine function, cognition, and individual differences may all be interconnected in an important way is a brief social interaction with an opposite sex individual. Specifically, research in our lab has shown that this type of social interaction stimulus can elicit an endocrine and behavioral courtship response in male participants. Although recent research in humans has studied hormonal reactivity during brief social interactions that may be interpreted as courtship opportunities, less is known about how courtship interactions evolved in conjunction with motivation, personality, and social cognition, how psychosocial stress responsivity may alter the effects of hormones and cognition on social interaction behavior, and how these elements have the ability to promote or dampen behaviors or cognitive abilities that facilitate courtship directly. This study will investigate the function of physiological and cognitive changes that occur during a brief social interaction scenario by manipulating both the ecological scenario and physiological state of male and female participants before a potential courtship interaction.
+
+# Method
+Participants will be randomly assigned prior to arrival to either a control or psychosocial stress condition (Trier Social Stress Test), and those assigned to the stress condition will also be semi-randomly assigned to interact with either same-sex or opposite-sex judges during the Trier Social Stress Test (TSST), based on researcher availability.  Upon arrival at the lab, participants will provide consent, fill out questionnaires (see below), and participate in either the control or TSST condition. Following the assigned condition, all subjects will go through a social interaction with an opposite-sex confederate. Finally, participants will complete two social decision making tasks and participate in a phased debriefing. Following full debriefing, participants will be compensated and the experimental session will end. Saliva samples will be collected at various time points throughout the tasks to assess hormone levels via ELISA: once before the control/TSST condition, once after the control/TSST condition, and once after the social interaction. Cognitive tasks will also be administered throughout the protocol, in conjunction with the collected saliva samples.
+
+# Result
+
+* In this report, we will explore the effects of brief social interactions and acute psychosocial stress on hormones only since the data on cognitions and courtship behavior in men and women is still not ready.
+* We will address the session in which we collect the saliva sample to assess cortisol and testosterone concentrations by
+    + A: before TSST (baseline concentration)
+    + B: after TSST or control condition
+    + C: after social interaction
+
+\newpage
+
+```{r setup, results = 'hide'}
+# global setting
+knitr::opts_chunk$set(echo = FALSE)
+options(warn = -1)
+
+# load libraries
+library(tidyverse)
+library(ggplot2)
+library(ggpmisc)
+library(rcompanion)
+library(knitr)
+library(broom)
+# setting theme for ggplot
+theme_set(theme_minimal())
+theme_update(text = element_text(family = "Times"))
+```
+
+```{r}
+# Functions to be used
+
+## ploting the mean of hormone concentration with 95% confidence interval
+## over 3 sessions, grouped by condition
+## input: dataframe that contain only the hormone in interest
+##        (either cortisol or testosterone)
+plot_repeated_meas <- function(hormone) {
+  # Calculate needed statistic
+  Sum = groupwiseMean(
+    Conc ~ tsst + session,
+    data   = hormone,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  )
+  # plot
+  ggplot(Sum, aes(session, Mean, color = tsst)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(.2)
+    ) +
+    geom_point(shape = 15,
+               size = 4,
+               position = position_dodge(.2)) +
+    labs(title = "",
+         y = "Concentration",
+         x = "Session") + 
+    scale_color_discrete(name = "")
+}
+
+## ploting the mean of hormone concentration with 95% confidence interval
+## over 3 sessions, grouped by condition and gender
+## input: dataframe that contain only the hormone in interest
+##        (either cortisol or testosterone)
+plot_repeated_meas_gen <- function(hormone) {
+  # Calculate needed statistic
+  Sum = groupwiseMean(
+    Conc ~ tsst + session + gender,
+    data   = hormone,
+    conf   = 0.95,
+    traditional = FALSE,
+    percentile  = TRUE
+  )
+  # plot
+  ggplot(Sum, aes(session, Mean, color = tsst)) +
+    # 95% Confidence interval
+    geom_errorbar(
+      aes(ymin = Percentile.lower,
+          ymax = Percentile.upper),
+      width = .2,
+      size = 0.7,
+      position = position_dodge(.2)
+    ) +
+    geom_point(shape = 15,
+               size = 4,
+               position = position_dodge(.2)) +
+    labs(title = "",
+         y = "Concentration",
+         x = "Session") +
+    facet_wrap( ~ gender) +
+    scale_color_discrete(name = "")
+}
+```
+
+```{r raw_data,warning = FALSE, message = FALSE}
+## load the data
+
+# hormone concentration data
+hormone <- read_csv("data/2018 Assay Data - Sheet1.csv")
+
+# the information of each subject
+subject <-
+  read_csv(
+    "data/Participant Information _ Condition Spreadsheet - Participants.csv",
+    col_names = TRUE,
+    col_types = cols()
+  )
+
+```
+
+```{r tidying, cache = TRUE, dependson = "raw_data"}
+## Tidying and combining data
+
+# Tidying hormone data
+hormone <- select(hormone, -"Participant #")
+
+# Tidying subject data
+subject <- subject %>%
+  slice(2:157) %>%
+  select("Participant #","Participant ID", "Condition # (1-8)", 
+         "Gender", "TSST/Control Condition", "Judges Sex") %>%
+  mutate(Gender = ifelse(Gender == "F","Female","Male"))
+colnames(subject) <- c("number","ID","condition","gender","tsst","judge_sex")
+subject <- mutate(subject,judge_sex = ifelse(judge_sex == "F","Female","Male"))
+
+# create a combined dataframe
+# each observation = each subject in each hormone in each session
+relation <- full_join(subject, hormone, by = c("ID" = "Participant ID")) %>%
+  select(number, everything(), -Cort_A_S1_Conc, -Cort_B_S1_Conc, -Cort_C_S1_Conc, 
+         -Cort_A_S2_Conc, -Cort_B_S2_Conc, -Cort_C_S2_Conc, -Testo_A_S1_Conc, 
+         -Testo_B_S1_Conc, -Testo_C_S1_Conc, -Testo_A_S2_Conc, -Testo_B_S2_Conc, -Testo_C_S2_Conc) %>%
+  # create a column contain difference of concentration between session
+  mutate(Diff_Cort_B_A = Cort_B_Conc - Cort_A_Conc,
+         Diff_Cort_C_B = Cort_C_Conc - Cort_B_Conc,
+         Diff_Testo_B_A = Testo_B_Conc - Testo_A_Conc,
+         Diff_Testo_C_B = Testo_C_Conc - Testo_B_Conc) %>%
+  unite("Cort", c(Cort_A_Conc, Cort_A_Std_Dev, "CV_(%)_Cort_A",
+                  Cort_B_Conc, Cort_B_Std_Dev, "CV_(%)_Cort_B",
+                  Cort_C_Conc, Cort_C_Std_Dev, "CV_(%)_Cort_C",
+                  Diff_Cort_B_A, Diff_Cort_C_B)) %>%
+  unite("Testo", c(Testo_A_Conc, Testo_A_Std_Dev, "CV_(%)_Testo_A",
+                  Testo_B_Conc, Testo_B_Std_Dev, "CV_(%)_Testo_B",
+                  Testo_C_Conc, Testo_C_Std_Dev, "CV_(%)_Testo_C",
+                  Diff_Testo_B_A, Diff_Testo_C_B)) %>%
+  gather(Cort, Testo, key = "hormone", value = "value") %>%
+  separate(value, into = c("A_Conc", "A_Std", "A_CV", 
+                           "B_Conc", "B_Std", "B_CV",
+                           "C_Conc", "C_Std", "C_CV",
+                           "Diff_B_A", "Diff_C_B"), sep = "_") %>%
+  mutate(Diff = A_Conc) %>%
+  unite("A", c("A_Conc", "A_Std", "A_CV", "Diff")) %>%
+  unite("B", c("B_Conc", "B_Std", "B_CV", "Diff_B_A")) %>%
+  unite("C", c("C_Conc", "C_Std", "C_CV", "Diff_C_B")) %>%
+  gather(A,B,C,key = "session", value = "value") %>%
+  separate(value, into = c("Conc", "Std", "CV", "Diff"), sep = "_", convert = T) %>%
+  arrange(ID, hormone, session) %>%
+  mutate(lag_Conc = lag(Conc)) %>%
+  # create a percentage change
+  mutate(per_diff = ifelse(session == "A",Diff,Diff/lag_Conc)) %>%
+  filter(ID != "105C", ID != "113S", ID != "118C", ID != "146C")
+```
+
+```{r, cache = TRUE, dependson = "tidying"}
+# Create a dataframe unique for each hormone/ each condition
+
+## Cortisol
+Cort <- relation %>%
+  filter(hormone == "Cort",!(is.na(Conc)))
+
+# Cortisol daaframe for comparing percentage change
+Cort_per_diff <- Cort %>%
+  select(-Conc,-Std,-CV,-Diff, -lag_Conc) %>%
+  spread(session, value = per_diff) %>%
+  arrange(ID)
+
+## Testosterone
+Testo <- relation %>%
+  filter(hormone == "Testo",!(is.na(Conc)))
+
+# Testosterone daaframe for comparing percentage change
+Testo_per_diff <- Testo %>%
+  select(-Conc,-Std,-CV,-Diff, -lag_Conc) %>%
+  spread(session, value = per_diff) %>%
+  arrange(ID)
+
+## TSST
+tsst_Cort <- Cort %>%
+  filter(tsst == "TSST")
+tsst_Testo <- Testo %>%
+  filter(tsst == "TSST")
+
+# TSST daaframe for comparing percentage change
+tsst_Cort_per_diff <- Cort_per_diff %>%
+  filter(tsst == "TSST")
+tsst_Testo_per_diff <- Testo_per_diff %>%
+  filter(tsst == "TSST")
+
+```
+
+## Effects of TSST treatment on hormone concentration after TSST and after social interaction
+
+### Cortisol
+
+From the graph below, we can see the at the baseline, there is no significant different in the cortisol concentration between control and TSST condition. However, after TSST, the cortisol concentration in TSST condition is significantly higher than the control condition, and remains being significantly higher after social interaction. This confirms that our manipulation of stress by using TSST is successful.  
+
+&nbsp;
+
+```{r}
+plot_repeated_meas(Cort) +
+  labs(title = "Cortisol Concentration by Condition",
+       y = "Cortisol Concentration")
+```
+
+\newpage
+
+From the graph below, we can see that in both male and female participants, cortisol concentration in TSST condition is significantly higher than the control condition after TSST. However, only male participants have significantly higher cortisol concentration in TSST condition than the control condition after social interaction.    
+&nbsp;
+
+```{r}
+plot_repeated_meas_gen(Cort) +
+  labs(title = "Cortisol Concentration by Condition and Gender",
+       y = "Cortisol Concentration")
+```
+
+\newpage
+
+From the Multiple linear regression output, we can see that there is a significant interaction effect between session B and TSST condition. Therefore, we can conclude that the cortisol concentrations between TSST and control conditions are different.
+
+&nbsp;
+
+```{r}
+# Multiple linear regression
+lm_c <- lm(data = Cort, Conc ~ session + tsst + session*tsst + gender)
+kable( tidy(lm_c) )
+kable( glance(lm_c)[1:6] )
+kable( anova(lm_c) )
+```
+
+\newpage
+
+### Testosterone
+
+From the graph below, we can see that there is no significant different between testosterone concentration in TSST and control condition at any point in time.  
+
+&nbsp;
+
+```{r}
+plot_repeated_meas(Testo)
+```
+
+\newpage
+
+From the graph below, there is no significant different between testosterone concentration in TSST and control condition at any point in time and in both females and males.  
+
+&nbsp;
+
+```{r}
+plot_repeated_meas_gen(Testo)
+```
+\newpage
+
+From the Multiple linear regression output, we can see that there is a significant effect of gender on testosterone concentration. This is what we expect since males normally have higher testosterone concentration than females. 
+
+&nbsp;
+
+```{r}
+# Multiple linear regression
+lm_t <- lm(data = Testo, Conc ~ session + tsst + session*tsst + gender)
+kable( tidy(lm_t) )
+kable( glance(lm_t)[1:6] )
+kable( anova(lm_t) )
+```
+
+\newpage
+
+## Relationship between hormone concentration change (%) after TSST and hormone concentration change (%) after social interaction
+
+### Cortisol
+There doesn't seem to be any correlation between cortisol concentration change (%) after TSST and cortisol concentration change (%) after social interaction in any genders. Therefore, cortisol concentration change (%) after TSST cannot predict cortisol concentration change (%) after social interaction and vice versa.
+
+&nbsp;
+
+```{r}
+ggplot(tsst_Cort_per_diff, aes(B, C)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  stat_fit_glance(method = 'lm',
+                       geom = 'text',
+                       aes(label = paste("P-value = ", signif(..p.value.., digits = 4), sep = ""))) +
+  labs(
+    title = "Relationship between changes in Cortisol (%)",
+    subtitle = "Change after TSST vs Change after Social interaction",
+    x = "Change in Cortisol after TSST (%)",
+    y = "Change in Cortisol after Social interaction (%)"
+  ) +
+  facet_wrap(~gender)
+```
+
+\newpage
+
+### Testosterone
+There seems to be a negative correlation between testosterone concentration change (%) after TSST and testosterone concentration change (%) after social interaction. The relationship is significant in female subjects while it is not but almost significant in male subjects. Therefore, testosterone concentration change (%) after TSST can predict testosterone concentration change (%) after social interaction and vice versa.
+
+&nbsp;
+
+```{r}
+ggplot(tsst_Testo_per_diff, aes(B, C)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  stat_fit_glance(method = 'lm',
+                       geom = 'text',
+                       aes(label = paste("P-value = ", signif(..p.value.., digits = 4), sep = ""))) +
+  labs(
+    title = "Relationship between changes in Testosterone (%)",
+    subtitle = "Change after TSST vs Change after Social interaction",
+    x = "Change in Testosterone after TSST (%)",
+    y = "Change in Testosterone after Social interaction (%)"
+  ) +
+  facet_wrap(~gender)
+```
+\newpage
+
+## Effects of TSST Judges' sex on hormone concentration after TSST and after social interaction
+
+### Cortisol
+The only significant change is between the cortisol concentration before TSST and after TSST in male subjects with female TSST judges. Female subjects have higher increase cortisol concentration after TSST when the judges are males than when the judges are females. Male subjects have higher increase cortisol concentration after TSST when the judges are females than when the judges are males. This seems to suggest that when the subjects undergo TSST with opposite-sex judges, the subjects exhibit higher increase in cortisol concentration.  
+
+&nbsp;
+
+```{r}
+Sum = groupwiseMean(
+  Conc ~ judge_sex + session + gender,
+  data   = tsst_Cort,
+  conf   = 0.95,
+  traditional = FALSE,
+  percentile  = TRUE
+)
+
+ggplot(Sum, aes(judge_sex, Mean, fill = session)) +
+  geom_col(position = "dodge") +
+  geom_errorbar(
+    aes(ymin = Percentile.lower,
+        ymax = Percentile.upper),
+    width = .2,
+    position = position_dodge(.9)
+  ) +
+  facet_wrap( ~ gender) +
+  labs(title = "Cortisol Level in TSST condition by Gender and Judge sex",
+       y = "Concentration",
+       x = "Judge Sex")
+```
+\newpage
+```{r}
+Sum = groupwiseMean(
+  B ~ judge_sex + gender,
+  data   = tsst_Cort_per_diff,
+  conf   = 0.95,
+  traditional = FALSE,
+  percentile  = TRUE
+)
+
+ggplot(Sum, aes(gender, Mean, fill = judge_sex)) +
+  geom_col(position = "dodge") +
+  geom_errorbar(
+    aes(ymin = Percentile.lower,
+        ymax = Percentile.upper),
+    width = .2,
+    position = position_dodge(.9)
+  ) +
+  labs(title = "Change in Cortisol Level (%) after TSST by Gender and Judge sex",
+       y = "Change in Cortisol Level (%) after TSST",
+       x = "Gender") +
+  scale_fill_discrete(name = "Judge Sex")
+```
+
+\newpage
+
+### Testosterone
+Female subjects exhibit decreasing in testosterone concentration after TSST when the tsst judges are females. However, female subjects exhibit increasing in testosterone concentration when the judges are males. Male participants exhibit increasing in testosterone concentration after TSST both when the tsst judges are females and males.
+
+&nbsp;
+
+```{r}
+Sum = groupwiseMean(
+  Conc ~ judge_sex + session + gender,
+  data   = tsst_Testo,
+  conf   = 0.95,
+  traditional = FALSE,
+  percentile  = TRUE
+)
+
+ggplot(Sum, aes(judge_sex, Mean, fill = session)) +
+  geom_col(position = "dodge") +
+  geom_errorbar(
+    aes(ymin = Percentile.lower,
+        ymax = Percentile.upper),
+    width = .2,
+    position = position_dodge(.9)
+  ) +
+  facet_wrap( ~ gender) +
+  labs(title = "Testosterone Level in TSST condition by Gender and Judge sex",
+       y = "Concentration",
+       x = "Judge Sex")
+```
+\newpage
+```{r}
+Sum = groupwiseMean(
+  B ~ judge_sex + gender,
+  data   = tsst_Testo_per_diff,
+  conf   = 0.95,
+  traditional = FALSE,
+  percentile  = TRUE
+)
+
+ggplot(Sum, aes(gender, Mean, fill = judge_sex)) +
+  geom_col(position = "dodge") +
+  geom_errorbar(
+    aes(ymin = Percentile.lower,
+        ymax = Percentile.upper),
+    width = .2,
+    position = position_dodge(.9)
+  ) +
+  labs(title = "Change in Testosterone Level (%) after TSST by Gender and Judge sex",
+       y = "Change in Testosterone Level (%) after TSST",
+       x = "Gender") +
+  scale_fill_discrete(name = "Judge Sex")
+```
+
+\newpage
+
+# Conclusion
+* Cortisol level is increased after TSST in both male and female subjects.
+* However, change in testosterone level is not different between control and TSST condition.
+* Change in testosterone (%) after TSST is negatively related to change in testosterone (%) after social interaction. However, there is no relationship between changes in cortisol (%)
+* In TSST condition, cortisol increases after TSST more when the judges are the opposite sex of the subject than when the judges are the same sex as the subject.
+
+# Acknowledgement
+Thank you Nora Nickels for allowing me to use her Doctoral thesis data for this project.
+
+# Reference
+Nickels, N. (2018). Dissertation Proposal: The effects of brief social interactions and acute psychosocial stress on cognition, hormones, and courtship behavior in men and women.
